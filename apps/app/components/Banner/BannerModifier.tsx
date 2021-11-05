@@ -1,33 +1,19 @@
-import React, {FC, useState} from 'react';
-import {TransitionProps} from "@material-ui/core/transitions";
-import {Slide} from "@material-ui/core";
-import Banner from "./Banner";
+import React, {FC, useEffect, useState} from 'react';
 import {BannerTypes} from "./types";
+import {Box, Slider, TextareaAutosize} from "@material-ui/core";
 
-export const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement;
-  },
-  ref: React.Ref<unknown>,
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+interface BannerModifierInterface {
+  setBanner: (banner: BannerTypes) => void
+}
 
-const BannerModifier: FC = () => {
-  const [bannerList, setBannerList] = useState<BannerTypes[] | []>([])
+const BannerModifier: FC<BannerModifierInterface> = ({setBanner}) => {
   const [text, setText] = useState('')
   const [width, setWidth] = useState(50)
   const [height, setHeight] = useState(10)
-  const [color, setColor] = useState('')
-  const [open, setOpen] = useState(false);
 
-  const addBanner = () => {
-    setBannerList(prev => [...prev, {text, width, height, color}])
-    setOpen(false);
-  }
-  const deleteBanner = (): void => {
-    setBannerList(prev => prev.slice(0, -1))
-  }
+  useEffect(() => {
+    setBanner({text, width, height})
+  }, [text, width, height])
 
   const handleChangeWidth = (event: React.ChangeEvent<HTMLInputElement>, newValue: number): void => {
     setWidth(newValue);
@@ -38,35 +24,20 @@ const BannerModifier: FC = () => {
   };
 
 
-  //Modal handlers===============
-  const handleClickOpen = ():void => {
-    setOpen(true);
-  };
-
-  const handleClose = (): void => {
-    setOpen(false);
-  };
-  //====================
-
   return (
-    <div>
-      <Banner
-        bannerList={bannerList}
-        setText={setText}
-        setColor={setColor}
-        open={open}
-        addBanner={addBanner}
-        deleteBanner={deleteBanner}
-        handleChangeWidth={handleChangeWidth}
-        handleChangeHeight={handleChangeHeight}
-        handleClickOpen={handleClickOpen}
-        handleClose={handleClose}
-        width={width}
-        height={height}
-        color={color}
-        text={text}
+    <div style={{padding: '20px'}}>
+      <TextareaAutosize
+        aria-label="empty textarea"
+        placeholder="Empty"
+        style={{width: 100 + '%', resize: 'none', display: 'block', marginBottom: '30px'}}
+        onChange={e => setText(e.target.value)}
       />
+      <span>Height:</span>
+      <div style={{width: '300px'}}>
+        <Slider value={height} onChange={handleChangeHeight} aria-label="Default" valueLabelDisplay="auto"/>
+      </div>
     </div>
+
   );
 };
 
